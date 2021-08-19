@@ -33,8 +33,8 @@ export const translate = (word) => {
     });
     response.on('end', () => {
       type BaiduResult = {
-        error_code: string,
-        error_msg: string,
+        error_code?: string,
+        error_msg?: string,
         from: string,
         to: string,
         trans_result: {
