@@ -4,6 +4,22 @@ import {Md5} from 'md5-typescript';
 import {appId, appSecret} from './private';
 import {Buffer} from 'buffer';
 
+const errorMap = {
+  52001: '请求超时',
+  52002: '系统错误',
+  52003: '未授权用户',
+  54000: '必填参数为空',
+  54001: '签名错误',
+  54003: '访问频率受限',
+  54004: '账户余额不足',
+  54005: '长query请求频繁',
+  58000: '客户端IP非法',
+  58001: '译文语言方向不支持',
+  58002: '服务当前已关闭',
+  90107: '认证未通过或未生效',
+  unknown: '服务器繁忙'
+}
+
 export const translate = (word) => {
 
   const salt = Math.random();
@@ -46,15 +62,15 @@ export const translate = (word) => {
       const string = Buffer.concat(chunks).toString();
       const object: BaiduResult = JSON.parse(string);
 
-      if (object.error_msg) {
-        console.log(object.error_msg);
+      if (object.error_code) {
+        console.log(object.error_code);
+        console.error(errorMap[object.error_code] || object.error_msg);
         process.exit(2);
       } else {
         console.log('English:', object.trans_result[0].src);
         console.log('中文:', object.trans_result[0].dst);
         process.exit(0);
       }
-
     });
   });
 
