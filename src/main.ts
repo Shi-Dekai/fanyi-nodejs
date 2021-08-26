@@ -4,7 +4,10 @@ import {Md5} from 'md5-typescript';
 import {appId, appSecret} from './private';
 import {Buffer} from 'buffer';
 
-const errorMap = {
+type ErrorMap = {
+  [key: string]: string
+}
+const errorMap: ErrorMap = {
   52001: '请求超时',
   52002: '系统错误',
   52003: '未授权用户',
@@ -20,16 +23,24 @@ const errorMap = {
   unknown: '服务器繁忙'
 }
 
-export const translate = (word) => {
+export const translate = (word: string) => {
 
   const salt = Math.random();
   const sign = Md5.init(appId + word + salt + appSecret);
+  let from, to
+  if (/[a-zA-Z]/.test(word[0])){
+    from = 'en'
+    to = 'zh'
+  }else{
+    from = 'zh'
+    to = 'en'
+  }
 
   const query: string = querystring.stringify({
     q: word,
-    from: 'en',
-    to: 'zh',
     appid: appId,
+    from,
+    to,
     salt,
     sign
     // q=add&from=en&to=zh&appid=20210816000918856&salt=0.34438352356554547&sign=18f5e839b7b414b763ff7f54942443ed
@@ -43,8 +54,8 @@ export const translate = (word) => {
   };
 
   const request = https.request(options, (response) => {
-    let chunks = [];
-    response.on('data', (chunk) => {
+    let chunks: Buffer[] = [];
+    response.on('data', (chunk: Buffer) => {
       chunks.push(chunk);
     });
     response.on('end', () => {
@@ -67,8 +78,7 @@ export const translate = (word) => {
         console.error(errorMap[object.error_code] || object.error_msg);
         process.exit(2);
       } else {
-        console.log('English:', object.trans_result[0].src);
-        console.log('中文:', object.trans_result[0].dst);
+        console.log(object.trans_result[0].dst);
         process.exit(0);
       }
     });
