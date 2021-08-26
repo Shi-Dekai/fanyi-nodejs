@@ -43,7 +43,6 @@ export const translate = (word: string) => {
     to,
     salt,
     sign
-    // q=add&from=en&to=zh&appid=20210816000918856&salt=0.34438352356554547&sign=18f5e839b7b414b763ff7f54942443ed
   });
 
   const options = {
